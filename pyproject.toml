@@ -6,6 +6,7 @@ authors = [
     {name = "Henrique Franco Herrmann"}
 ]
 readme = "README.md"
+packages = [{include="tcc_rastreamento_back"}]
 requires-python = ">=3.13"
 dependencies = [
     "fastapi (>=0.116.1,<0.117.0)",
