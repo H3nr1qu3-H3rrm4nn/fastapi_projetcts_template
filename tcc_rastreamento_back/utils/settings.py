@@ -1,23 +1,21 @@
-from pydantic_settings import BaseSettings, SettingsConfigDict
-from utils.app_enviroment import AppEnvironment
+from enum import Enum
+from pydantic_settings import BaseSettings
+
+class AppEnvironment(str, Enum):
+    DEVELOPMENT = "development"
+    PRODUCTION = "production"
 
 class Settings(BaseSettings):
-    """
-    Define as configurações lidas de variáveis de ambiente ou de um arquivo .env.
-    """
-    # Carrega as variáveis de um arquivo .env
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", case_sensitive=True)
-
-    # Configurações do Ambiente
+    # ATENÇÃO: A string de conexão agora usa 'postgresql+asyncpg'
+    DATABASE_URL: str = "postgresql+asyncpg://admin:admin@db:5432/rastreamento_db"
     APP_ENV: AppEnvironment = AppEnvironment.DEVELOPMENT
 
-    # Configurações do Banco de Dados
-    DATABASE_URL: str = "postgresql://admin:admin@db:5432/rastreamento_db"
+    # Configurações para JWT
+    SECRET_KEY: str = "e2fc6a47b06ca21ba2cc5850927b808e8fcd9cbb979ddafe43253ff911da9644"
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 1
 
-    def is_development(self) -> bool:
-        """ Verifica se o ambiente é de desenvolvimento. """
-        return self.APP_ENV == AppEnvironment.DEVELOPMENT
-
-    def is_production(self) -> bool:
-        """ Verifica se o ambiente é de produção. """
-        return self.APP_ENV == AppEnvironment.PRODUCTION
+    class Config:
+        case_sensitive = True
+        env_file = ".env"
+        env_file_encoding = "utf-8"
