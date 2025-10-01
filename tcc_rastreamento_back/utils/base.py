@@ -1,9 +1,6 @@
-# Este arquivo define a Base declarativa do SQLAlchemy.
-# Todas as classes de modelo da sua aplicação (como Usuario, Veiculo, etc.)
-# deverão herdar desta 'Base' para serem mapeadas corretamente para
-# as tabelas do banco de dados.
-
 from sqlalchemy.orm import declarative_base
+from sqlalchemy.ext.asyncio import AsyncAttrs
+from sqlalchemy.orm import DeclarativeBase
 
-# Cria a classe Base da qual todos os modelos ORM herdarão.
-Base = declarative_base()
+class Base(DeclarativeBase):
+    pass

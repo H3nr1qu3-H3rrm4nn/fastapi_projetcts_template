@@ -15,7 +15,12 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 1
 
+    # Configurações do aplicativo
+    app_name: str = "Rastreamento API"
+
     class Config:
         case_sensitive = True
         env_file = ".env"
         env_file_encoding = "utf-8"
+
+settings = Settings()

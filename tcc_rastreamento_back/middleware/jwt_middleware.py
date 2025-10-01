@@ -1,45 +1,68 @@
-from datetime import datetime, timedelta, timezone
-from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
-from jose import JWTError, jwt
-from sqlalchemy.orm import Session
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
+from jose import jwt
+from starlette.middleware.base import BaseHTTPMiddleware
 
-from tcc_rastreamento_back.utils.settings import settings
-from tcc_rastreamento_back.utils.connection_pool import get_db
-from tcc_rastreamento_back.core.user.user_repository import UserRepository
-from tcc_rastreamento_back.core.user.user_model import Usuario
+from core.user.user_service import UserService
+from tcc_rastreamento_back.utils import settings
+from tcc_rastreamento_back.utils.response_model import ResponseModel
+from utils.context_vars import admin, user_id
+from utils.context_vars import tenant_id
 
-# Define o esquema de autenticação OAuth2
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/usuarios/token")
+app = FastAPI()
 
-def create_access_token(data: dict) -> str:
-    """Cria um novo token de acesso JWT."""
-    to_encode = data.copy()
-    expire = datetime.now(timezone.utc) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
-    return encoded_jwt
 
-def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> Usuario:
-    """
-    Dependência para validar o token e obter o usuário atual.
-    Será usada para proteger os endpoints.
-    """
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Não foi possível validar as credenciais",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-    try:
-        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
-        email: str = payload.get("sub")
-        if email is None:
-            raise credentials_exception
-    except JWTError:
-        raise credentials_exception
-    
-    repo = UserRepository()
-    user = repo.get_user_by_email(db, email=email)
-    if user is None:
-        raise credentials_exception
-    return user
+class JWTMiddleware(BaseHTTPMiddleware):
+
+    allowed_paths = [
+        "/health"
+    ]
+
+    async def dispatch(self, request: Request, call_next):
+        # Verificar rotas permitidas - usar startswith para permitir subrotas
+        if any(request.url.path.startswith(path) for path in self.allowed_paths):
+            return await call_next(request)
+
+        try:
+            token = request.headers.get("Authorization")
+            token = jwt.decode(
+                token.removeprefix("Bearer "), settings.jwt_key, settings.jwt_algorithm
+            )
+            request.scope["headers"].append((b"email", str(token["sub"]).encode()))
+            request.scope["headers"].append((b"user", str(token["user"]).encode()))
+            user_id.set(token["user"])
+            admin.set(token["admin"])
+
+
+            user_db = await UserService().find_by_email(token["sub"],
+                                                        tenant_id=token["ten"])
+            if user_db is None:
+                return JSONResponse(
+                    status_code=401,
+                    content=ResponseModel(
+                        success=False, object={}, message="Usuário não encontrado!"
+                    ).model_response(),
+                )
+            elif not user_db.is_active:
+                return JSONResponse(
+                    status_code=401,
+                    content=ResponseModel(
+                        success=False, object={}, message="Usuário inativo!"
+                    ).model_response(),
+                )
+
+        except Exception as e:
+            return JSONResponse(
+                status_code=401,
+                content=ResponseModel(
+                    success=False,
+                    object={},
+                    message="Token de acesso inválido ou não enviado!",
+                ).model_response(),
+            )
+
+        response = await call_next(request)
+        return response
+
+
+app.add_middleware(JWTMiddleware)

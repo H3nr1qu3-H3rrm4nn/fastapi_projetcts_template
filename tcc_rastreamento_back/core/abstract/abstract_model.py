@@ -1,18 +1,16 @@
 from datetime import datetime
-from time import time
-from xmlrpc.client import Boolean
-from sqlalchemy import Column, Integer, String, DateTime
-from tcc_rastreamento_back.utils.base import Base
+
+from sqlalchemy import Boolean, Column, DateTime, Integer, String
+from sqlalchemy_continuum import make_versioned
+
+make_versioned(user_cls="User")
 
 
-class AbstractModel(Base):
-    """
-    Modelo Abstrato do qual outras classes de modelo podem herdar.
-    """
-    __abstract__ = True
+class AbstractModel:
 
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String)
-    created_at = Column(DateTime, default=datetime.now)
-    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    tenant_id = Column(Integer, default=1)
     is_active = Column(Boolean, default=True)
+    name = Column(String(100), nullable=True)
+    created_at = Column(DateTime, default=datetime.now())
+    updated_at = Column(DateTime, default=datetime.now())
