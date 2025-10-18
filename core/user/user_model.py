@@ -1,6 +1,6 @@
 from typing import List
 from pydantic import BaseModel, Field, field_validator
-from sqlalchemy import Column, ForeignKey, Integer, String, Text
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import relationship
 
 from core.abstract.abstract_model import AbstractModel
@@ -14,8 +14,8 @@ class User(Base, AbstractModel):
 
     email = Column(String, nullable=False)
     password = Column(String, nullable=False)
-    image_src = Column(Text, nullable=True)
-
+    image_src = Column(String, nullable=True)
+    is_admin = Column(Boolean)
 
 class UserLogin(BaseModel):
     email: str = Field(

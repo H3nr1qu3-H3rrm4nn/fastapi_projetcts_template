@@ -9,7 +9,6 @@ make_versioned(user_cls="User")
 class AbstractModel:
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    tenant_id = Column(Integer, default=1)
     is_active = Column(Boolean, default=True)
     name = Column(String(100), nullable=True)
     created_at = Column(DateTime, default=datetime.now())

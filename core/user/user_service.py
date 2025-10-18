@@ -19,7 +19,6 @@ from utils.exception_model import ExceptionModel
 from utils.filter_model import FiltersSchema
 from utils.format import create_model_instance
 import logging
-import logging.config
 
 from utils.response_model import ResponseModel
 from utils.settings import Settings
@@ -31,7 +30,6 @@ class UserService(AbstractService):
 
 
     user_id = "unknown_user"
-    tenant_id = "unknown_tenant"
 
     crypt_context = CryptContext(schemes=["sha256_crypt"])
     
@@ -59,7 +57,7 @@ class UserService(AbstractService):
         }
 
         self.login_user_log(
-            user_id_value=f"{user_db.id}", tenant_id_value=f"{user_db.tenant_id}"
+            user_id_value=f"{user_db.id}"
         )
 
         logger.info("Usuario logado com sucesso!!")
@@ -69,7 +67,7 @@ class UserService(AbstractService):
         return access_token
 
 
-    async def find_by_email(self, email: str, tenant_id: int = None):
+    async def find_by_email(self, email: str):
             data = await UserRepository().find_by_email(email)
             return data
 
@@ -176,9 +174,8 @@ class UserService(AbstractService):
         """
         logger.info(f"Usuário {user_id_value} realizou logout")
 
-    def login_user_log(self, user_id_value, tenant_id_value):
+    def login_user_log(self, user_id_value):
         self.user_id = user_id_value
-        self.tenant_id = tenant_id_value
         self.update_logging_format()
 
     def update_logging_format(self):
@@ -186,7 +183,6 @@ class UserService(AbstractService):
         for handler in logger.handlers:
             if isinstance(handler.formatter, CustomFormatter):
                 handler.formatter.user_id_getter = self.user_id
-                handler.formatter.tenant_id_getter = self.tenant_id
 
     def find_permission(self, hash: str):
         data = UserRepository().find_permission(hash)

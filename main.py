@@ -61,7 +61,3 @@ app.add_middleware(
 app.include_router(UserController().route)
 
 
-@app.get("/tracking_api")
-def read_root():
-    return {"message": "Bem-vindo à API de Rastreamento!"}
-
