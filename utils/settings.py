@@ -6,8 +6,8 @@ class AppEnvironment(str, Enum):
     PRODUCTION = "production"
 
 class Settings(BaseSettings):
-    # ATENÇÃO: A string de conexão agora usa 'postgresql+asyncpg'
-    DATABASE_URL: str = "postgresql+asyncpg://admin:admin@db:5432/rastreamento_db"
+
+    DATABASE_URL: str = "postgresql+asyncpg://admin:tracking2025@localhost:5432/tracker"
     APP_ENV: AppEnvironment = AppEnvironment.DEVELOPMENT
 
     # Configurações para JWT

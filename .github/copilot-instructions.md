@@ -1,6 +1,6 @@
 # AI contributor guide for tcc_rastreamento_back
 
-Use this as your quick-start map to be productive in this repo. Keep changes small, follow the established patterns, and prefer absolute imports under `tcc_rastreamento_back.*`.
+Use this as your quick-start map to be productive in this repo. Keep changes small, follow the established patterns, and prefer absolute imports under `*`.
 
 ## Big picture
 - Stack: FastAPI + async SQLAlchemy (postgresql+asyncpg), Pydantic Settings, passlib, jose JWT, Alembic (declared, not wired), SQLAlchemy-Continuum (versioning hooks present but partially integrated).
@@ -20,13 +20,13 @@ Use this as your quick-start map to be productive in this repo. Keep changes sma
   - `DATABASE_URL=postgresql+asyncpg://<user>:<pass>@<host>:<port>/<db>`
   - `SECRET_KEY`, `ALGORITHM` (HS256), `ACCESS_TOKEN_EXPIRE_MINUTES`
 - Start server (needs uvicorn installed):
-  - Module: `tcc_rastreamento_back.main:app`
+  - Module: `main:app`
   - Windows PowerShell: install uvicorn if missing; run with reload.
 - Alembic is declared but no config is present in the repo; schema is created via `Base.metadata.create_all` in `main.py`.
 
 ## Key files and patterns
 - App entry: `tcc_rastreamento_back/main.py` creates tables and mounts routers. Ensure routers are imported and included here.
-- Settings: prefer `tcc_rastreamento_back.utils.settings.Settings`. `utils/config.py` appears legacy; avoid mixing both.
+- Settings: prefer `utils.settings.Settings`. `utils/config.py` appears legacy; avoid mixing both.
 - DB access: `utils/connection_pool.py`
   - Engine: async `postgresql+asyncpg` with `create_async_engine`.
   - Sessions: use `ConnectionPool.get_db_session()` (async contextmanager). For optional session parameters, use `utils/contexts.conditional_session`.
@@ -50,7 +50,7 @@ Use this as your quick-start map to be productive in this repo. Keep changes sma
 - Note: `get_db` used in `jwt_middleware` is not defined; provide a dependency wrapper around `ConnectionPool.get_db_session()` or adjust to async session usage.
 
 ## Gotchas and current gaps
-- Imports are inconsistent: use absolute `tcc_rastreamento_back.*` to avoid runtime path issues.
+- Imports are inconsistent: use absolute `*` to avoid runtime path issues.
 - `main.py` references `engine` and `usuario.router`; ensure these are imported or fix to use `ConnectionPool.get_engine()` and real routers.
 - `user`, `role`, `tracker`, `vehicle` modules are mostly empty; endpoints won’t work until implemented.
 - `logging.yaml` is referenced in exceptions code but not present.
@@ -68,7 +68,7 @@ Use this as your quick-start map to be productive in this repo. Keep changes sma
   # create venv and install
   py -m venv .venv; .\.venv\Scripts\Activate.ps1; pip install -e . uvicorn
   # run
-  uvicorn tcc_rastreamento_back.main:app --reload --host 0.0.0.0 --port 8000
+  uvicorn main:app --reload --host 0.0.0.0 --port 8000
   """
 
 ---

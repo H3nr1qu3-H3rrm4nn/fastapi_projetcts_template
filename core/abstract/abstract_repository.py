@@ -11,8 +11,8 @@ from sqlalchemy.future import select
 from sqlalchemy.orm import joinedload
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from tcc_rastreamento_back.utils.exception_model import ExceptionModel
-from tcc_rastreamento_back.utils.filter_model import FiltersSchema
+from utils.exception_model import ExceptionModel
+from utils.filter_model import FiltersSchema
 from utils.connection_pool import ConnectionPool
 
 from utils.contexts import conditional_session

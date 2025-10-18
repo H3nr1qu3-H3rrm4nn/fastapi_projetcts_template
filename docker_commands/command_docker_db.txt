@@ -1,0 +1,9 @@
+docker run `
+  --name tracker_engine `
+  -e POSTGRES_USER=admin `
+  -e POSTGRES_PASSWORD=tracking2025 `
+  -e POSTGRES_DB=tracker `
+  -p 5433:5432 `
+  -v tracker_db_data:/var/lib/postgresql/data `
+  -d postgres
+

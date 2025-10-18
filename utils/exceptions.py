@@ -5,7 +5,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import IntegrityError
 import yaml
-from tcc_rastreamento_back.utils.response_model import ResponseModel
+from utils.response_model import ResponseModel
 from utils.exception_model import ExceptionModel
 
 with open("logging.yaml", "rt") as f:

@@ -1,0 +1,19 @@
+# build
+docker build -t tracker_api:poetry .
+
+#build sem cache
+docker build --no-cache -t tracker_api:poetry .
+
+# rodar 
+docker run `
+  --name tracker_api `
+  --network tracker_net `
+  --restart unless-stopped `
+  -p 8000:8000 `
+  -e "DATABASE_URL=postgresql+asyncpg://admin:tracking2025@tracker_db:5432/tracker" `
+  -e "SECRET_KEY=<sua_chave_forte>" `
+  -e "ALGORITHM=HS256" `
+  -e "ACCESS_TOKEN_EXPIRE_MINUTES=60" `
+  -e "PYTHONPATH=/app" `
+  -v "${PWD}:/app" `
+  tracker_api:poetry uvicorn main:app --host 0.0.0.0 --port 8000 --reload

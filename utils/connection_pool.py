@@ -17,7 +17,7 @@ class ConnectionPool:
         if getenv("POSTGRES_PORT")
         else settings.postgres_port
     )
-    name = getenv("POSTGRES_DB_NAME", "agronova_engine_bd")
+    name = getenv("POSTGRES_DB_NAME", "tracking_db")
     encoding = "utf8"
 
     encoded_password = quote_plus(password)

@@ -2,11 +2,9 @@ from datetime import datetime
 from typing import Annotated
 
 from fastapi import APIRouter, Header, Query
-
-TokenService
-
-from tcc_rastreamento_back.utils.filter_model import FiltersSchema
-from tcc_rastreamento_back.utils.response_model import ResponseModel
+from core.token.token_service import TokenService
+from utils.filter_model import FiltersSchema
+from utils.response_model import ResponseModel
 
 
 

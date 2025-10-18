@@ -3,12 +3,13 @@ import logging.config
 from typing import Annotated
 
 from fastapi import Header, Request
-import yaml
 
 from core.abstract.abstract_controller import AbstractController
 from core.user.user_model import User, UserLogin, UserCreate, UserUpdate, UserLogout
 from core.user.user_service import UserService
-from utils.models.response_model import ResponseModel
+import yaml
+
+from utils.response_model import ResponseModel
 from utils.context_vars import user_id as context_user_id
 
 

@@ -4,8 +4,8 @@ from jose import jwt
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from core.user.user_service import UserService
-from tcc_rastreamento_back.utils import settings
-from tcc_rastreamento_back.utils.response_model import ResponseModel
+from utils import settings
+from utils.response_model import ResponseModel
 from utils.context_vars import admin, user_id
 from utils.context_vars import tenant_id
 
