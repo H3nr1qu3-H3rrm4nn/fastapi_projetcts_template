@@ -8,10 +8,7 @@ import yaml
 from utils.response_model import ResponseModel
 from utils.exception_model import ExceptionModel
 
-with open("logging.yaml", "rt") as f:
-    config = yaml.safe_load(f.read())
-    logging.config.dictConfig(config)
-    logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 class Exceptions():
 

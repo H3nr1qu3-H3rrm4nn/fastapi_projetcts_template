@@ -6,10 +6,10 @@ import yaml
 from utils.connection_pool import ConnectionPool
 from utils.contexts import conditional_session
 from utils.format import create_model_instance, format_update_instance
-from utils.models.exception_model import ExceptionModel
+from utils.exception_model import ExceptionModel
 
 from abc import ABC
-from utils.models.filter_model import FiltersSchema
+from utils.filter_model import FiltersSchema
 from core.abstract.abstract_repository import AbstractRepository
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -17,10 +17,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 sp_tz = pytz.timezone("America/Sao_Paulo")
 T = TypeVar("T")
 
-with open("logging.yaml", "rt") as f:
-    config = yaml.safe_load(f.read())
-    logging.config.dictConfig(config)
-    logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class AbstractService(Generic[T], ABC):

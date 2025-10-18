@@ -1,5 +1,7 @@
+
 docker run `
-  --name tracker_engine `
+  --name tracker_db `
+  --network tracker_net `
   -e POSTGRES_USER=admin `
   -e POSTGRES_PASSWORD=tracking2025 `
   -e POSTGRES_DB=tracker `

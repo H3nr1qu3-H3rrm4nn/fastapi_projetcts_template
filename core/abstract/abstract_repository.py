@@ -19,10 +19,7 @@ from utils.contexts import conditional_session
 from utils.format import apply_dynamic_filters, serialize_model
 import yaml
 
-with open("logging.yaml", "rt") as f:
-    config = yaml.safe_load(f.read())
-    logging.config.dictConfig(config)
-    logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 T = TypeVar("T")
 

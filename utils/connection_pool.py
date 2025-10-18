@@ -9,21 +9,21 @@ from utils.context_vars import tenant_id
 
 class ConnectionPool:
     
-    username = getenv("POSTGRES_USERNAME", settings.postgres_user)
-    password = getenv("POSTGRES_PASSWORD", settings.postgres_password)
-    host = getenv("POSTGRES_HOSTNAME", settings.postgres_host)
+    username =getenv("POSTGRES_USERNAME", settings.USERNAME)
+    password =getenv("POSTGRES_PASSWORD", settings.PASSWORD)
+    host =("POSTGRES_HOSTNAME", settings.HOST)
     port = (
         int(getenv("POSTGRES_PORT"))
         if getenv("POSTGRES_PORT")
-        else settings.postgres_port
+        else settings.POSTGRES_PORT
     )
-    name = getenv("POSTGRES_DB_NAME", "tracking_db")
+    name =getenv("POSTGRES_DB_NAME", settings.DB_NAME)
     encoding = "utf8"
 
     encoded_password = quote_plus(password)
 
     engine = create_async_engine(
-        f"postgresql+asyncpg://{username}:{encoded_password}@{host}:{port}/{name}",
+        settings.DATABASE_URL,
         pool_size=50,
         max_overflow=10,
     )
@@ -38,22 +38,6 @@ class ConnectionPool:
         expire_on_commit=False,
         autoflush=True
     )
-
-    @staticmethod
-    async def tenant_filter_query(original_query_method, tenant_id: str):
-        async def filtered_query(*entities, **kwargs):
-            query = await original_query_method(*entities, **kwargs)
-            if entities:
-                entity = entities[0]
-                # Check if the entity is a model class or a column of a model class
-                if hasattr(entity, "class_"):
-                    entity = entity.class_
-                # Apply the tenant filter if the entity has a tenant_id attribute
-                if hasattr(entity, "tenant_id"):
-                    query = query.where(entity.tenant_id == tenant_id)
-            return query
- 
-        return filtered_query
     
     @staticmethod
     @asynccontextmanager
@@ -68,11 +52,6 @@ class ConnectionPool:
             autocommit=False, autoflush=False, bind=ConnectionPool.engine
         )
         db_session = SessionLocal()
-        if tenant_flag:
-            original_query_method = db_session.query
-            db_session.query = await ConnectionPool.tenant_filter_query(
-                original_query_method, tenant_id_to_use
-            )
         async with ConnectionPool.async_session_factory() as session:
             yield session
     

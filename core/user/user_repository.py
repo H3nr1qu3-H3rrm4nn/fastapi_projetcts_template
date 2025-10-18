@@ -15,10 +15,7 @@ from utils.context_vars import user_id as uid
 
 # configure_mappers()
 
-with open("logging.yaml", "rt") as f:
-    config = yaml.safe_load(f.read())
-    logging.config.dictConfig(config)
-    logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 # Configuração do fuso horário de São Paulo
 sp_tz = pytz.timezone("America/Sao_Paulo")

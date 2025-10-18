@@ -30,6 +30,7 @@ COPY core ./core
 COPY utils ./utils
 COPY middleware ./middleware
 COPY main.py ./main.py
+COPY logging.yaml ./logging.yaml
 
 # Permite imports absolutos simples
 ENV PYTHONPATH="/app"
