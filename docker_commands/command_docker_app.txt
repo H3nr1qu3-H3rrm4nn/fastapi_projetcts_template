@@ -10,6 +10,7 @@ docker run `
   --network tracker_net `
   --restart unless-stopped `
   -p 8000:8000 `
+  -p 5678:5678 `
   -e "DATABASE_URL=postgresql+asyncpg://admin:tracking2025@tracker_db:5432/tracker" `
   -e "SECRET_KEY=<sua_chave_forte>" `
   -e "ALGORITHM=HS256" `

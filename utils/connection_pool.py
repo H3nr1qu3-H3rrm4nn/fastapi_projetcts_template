@@ -4,8 +4,6 @@ from urllib.parse import quote_plus
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from utils.settings import settings
-from utils.context_vars import tenant_id
-
 
 class ConnectionPool:
     
@@ -41,13 +39,10 @@ class ConnectionPool:
     
     @staticmethod
     @asynccontextmanager
-    async def get_db_session(tenant_flag=True, param_tenant_id=None):
+    async def get_db_session(tenant_flag=True):
         """
         Fornece uma sessão de banco de dados gerenciada com async with.
         """
-        tenant_id_to_use = (
-            param_tenant_id if param_tenant_id is not None else tenant_id.get()
-        )
         SessionLocal = sessionmaker(
             autocommit=False, autoflush=False, bind=ConnectionPool.engine
         )

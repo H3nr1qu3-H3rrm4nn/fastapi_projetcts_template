@@ -5,6 +5,7 @@ from typing import Annotated
 from fastapi import Header, Request
 
 from core.abstract.abstract_controller import AbstractController
+from core.token.token_service import TokenService
 from core.user.user_model import User, UserLogin, UserCreate, UserUpdate, UserLogout
 from core.user.user_service import UserService
 import yaml
@@ -26,6 +27,7 @@ class UserController(AbstractController):
             prefix="/user",
             service=user_service,
             tags=["User"],
+            token_service=TokenService(),
         )
         self.get_all()
         self.get_all_paginated()
@@ -37,9 +39,7 @@ class UserController(AbstractController):
         self.activate_by_id()
         self.audit()
         self.route.post("/login")(self.login)
-        self.route.post("/logout")(self.logout)
         self.route.get("/find_user_by_token")(self.find_user_by_token)
-        self.route.get("/permission/{hash}")(self.find_permission)
         self.route.post("/save")(self.save)
 
     async def save(self, new_data: UserCreate):
@@ -64,39 +64,6 @@ class UserController(AbstractController):
             object=dados_autenticacao
         ).model_response()
 
-    async def logout(self, logout_data: UserLogout):
-        """
-        Rota para logout do usuário.
-        Remove dispositivos FCM e invalida a sessão.
-        Usa o user_id da requisição autenticada pelo middleware.
-        """
-        user_id = context_user_id.get()
-        
-        if not user_id:
-            return ResponseModel(
-                success=False,
-                message="Usuário não identificado na sessão",
-                object={}
-            ).model_response()
-        
-        success = await user_service.logout(
-            user_id=user_id,
-            fcm_token=logout_data.fcm_token
-        )
-        
-        if success:
-            return ResponseModel(
-                success=True,
-                message="Logout realizado com sucesso",
-                object={"user_id": user_id}
-            ).model_response()
-        else:
-            return ResponseModel(
-                success=False,
-                message="Erro ao realizar logout",
-                object={}
-            ).model_response()
-
     async def find_user_by_token(
         self,
         Authorization: Annotated[str | None, Header()],
@@ -109,10 +76,3 @@ class UserController(AbstractController):
             object=response
         ).model_response()
 
-    def find_permission(self, hash: str):
-        response = user_service.find_permission(hash)
-        return ResponseModel(
-            success=True,
-            message="Busca de permissão realizada com sucesso!",
-            object=response
-        ).model_response()

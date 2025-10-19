@@ -62,7 +62,7 @@ class UserService(AbstractService):
 
         logger.info("Usuario logado com sucesso!!")
 
-        access_token = jwt.encode(payload, Settings().SECRET_KEY, Settings().JWT_ALGORITHM)
+        access_token = jwt.encode(payload, Settings().SECRET_KEY, Settings().ALGORITHM)
 
         return access_token
 
@@ -85,7 +85,7 @@ class UserService(AbstractService):
         """
         Método save sobrescrito para garantir que a senha seja encriptada antes de salvar.
         """
-        # Encripta a senha antes de salvar
+
         new_data.password = self.crypt_context.hash(new_data.password)
 
         db_model = create_model_instance(model, new_data)
@@ -125,7 +125,7 @@ class UserService(AbstractService):
             except Exception as e:
                 await db.rollback()
                 logger.error(
-                    f"EXCEPTION_REDE Não foi possível realizar a operação -> {e}", e
+                    f"EXCEPTION Não foi possível realizar a operação -> {e}", e
                 )
                 raise e
         return data
@@ -183,7 +183,3 @@ class UserService(AbstractService):
         for handler in logger.handlers:
             if isinstance(handler.formatter, CustomFormatter):
                 handler.formatter.user_id_getter = self.user_id
-
-    def find_permission(self, hash: str):
-        data = UserRepository().find_permission(hash)
-        return data

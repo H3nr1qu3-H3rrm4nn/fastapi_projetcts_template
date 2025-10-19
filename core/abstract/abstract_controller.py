@@ -1,16 +1,16 @@
 from datetime import datetime
 from typing import Annotated
 
-from fastapi import APIRouter, Header, Query
+from fastapi import APIRouter, Depends, Header, Query, Security
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from core.token.token_service import TokenService
 from utils.filter_model import FiltersSchema
 from utils.response_model import ResponseModel
 
-
-
+bearer_scheme = HTTPBearer()
 class AbstractController:
-    def __init__(self, model, model_create, model_update, prefix, service, tags):
-        self.route = APIRouter(prefix=prefix, tags=tags)
+    def __init__(self, model, model_create, model_update, prefix, service, tags, token_service):
+        self.route = APIRouter(prefix=prefix, tags=tags, dependencies=[Depends(self.validate_token)])
         self.model = model
         self.model_create = model_create
         self.model_update = model_update
@@ -19,9 +19,9 @@ class AbstractController:
 
     async def validate_token(
         self,
-        Authorization: Annotated[str | None, Header()],
+        credentials: HTTPAuthorizationCredentials = Security(bearer_scheme),
     ):
-        token = Authorization
+        token = credentials.credentials
         return await self.token_service.validate_token(token=token)
 
     def get_all(self):

@@ -3,11 +3,17 @@ import asyncio
 import logging
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
+
+from fastapi.security import HTTPBearer
+from middleware.jwt_middleware import JWTMiddleware
 from utils.base import Base
 from core.user.user_controller import UserController
 from utils.connection_pool import ConnectionPool
 from fastapi.middleware.cors import CORSMiddleware
 from utils.logging_config import setup_logging
+
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi import Depends, Security
 
 setup_logging()
 logger = logging.getLogger(__name__)
@@ -56,7 +62,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
+app.add_middleware(
+    JWTMiddleware
+)
 
 app.include_router(UserController().route)
 

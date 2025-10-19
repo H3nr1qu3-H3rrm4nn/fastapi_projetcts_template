@@ -5,7 +5,6 @@ from fastapi import status
 
 from utils.context_vars import (
     user_id as ctx_user_id,
-    tenant_id as ctx_tenant_id,
 )
 
 
@@ -24,7 +23,6 @@ class TokenService:
                 detail="Token ausente",
                 headers={"WWW-Authenticate": "Bearer"},
             )
-
         token_str = token[7:].strip() if token.lower().startswith("bearer ") else token.strip()
 
         try:
@@ -43,10 +41,7 @@ class TokenService:
 
         # Popular context vars se presentes
         uid = payload.get("sub") or payload.get("user_id")
-        tid = payload.get("tenant_id") or payload.get("tenant")
         if uid is not None:
             ctx_user_id.set(uid)
-        if tid is not None:
-            ctx_tenant_id.set(tid)
 
         return token_str

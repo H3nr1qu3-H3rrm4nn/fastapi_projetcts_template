@@ -9,9 +9,9 @@ Use this as your quick-start map to be productive in this repo. Keep changes sma
   - Service: orchestrates operations, handles commit/rollback, shapes data (`AbstractService`).
   - Repository: builds SQLAlchemy Core/ORM queries, serializes rows (`AbstractRepository`).
 - Data model conventions:
-  - `utils/base.py` defines `Base` (DeclarativeBase). Models typically mix in `core/abstract/abstract_model.py` fields: `id`, `tenant_id`, `is_active`, `name`, `created_at`, `updated_at` and enable versioning.
+  - `utils/base.py` defines `Base` (DeclarativeBase). Models typically mix in `core/abstract/abstract_model.py` fields: `id`, `is_active`, `name`, `created_at`, `updated_at` and enable versioning.
   - Soft-deletes via `is_active`; endpoints exist to activate/deactivate.
-- Multi-tenant: `utils/context_vars.py` manages `tenant_id`; `ConnectionPool` has a tenant-aware query hook (partially applied). Prefer explicit filters on `tenant_id` until this is unified.
+
 - Auth: JWT via `middleware/jwt_middleware.py` using `OAuth2PasswordBearer`; expects a `UserRepository` and `Usuario` model (currently stubs).
 
 ## Run, build, env
@@ -38,7 +38,7 @@ Use this as your quick-start map to be productive in this repo. Keep changes sma
 
 ## Implementing a new domain module
 1) Create folder `core/<domain>/` with: `<domain>_model.py`, `<domain>_repository.py`, `<domain>_service.py`, `<domain>_controller.py`.
-2) Model: subclass `Base` and include fields per `AbstractModel` (id, tenant_id, timestamps, is_active).
+2) Model: subclass `Base` and include fields per `AbstractModel` (id,  timestamps, is_active).
 3) Repository: extend patterns from `core/abstract/abstract_repository.py` (use async `select`, return serialized models when responding to controllers).
 4) Service: follow `core/abstract/abstract_service.py` methods: commit/rollback in service layer; use `conditional_session` when session may be provided.
 5) Controller: subclass-like usage of `AbstractController` to register routes (`get_all`, `save`, `update_by_id`, etc.) and return `ResponseModel`.
@@ -75,5 +75,4 @@ Use this as your quick-start map to be productive in this repo. Keep changes sma
 Questions to clarify for better automation:
 - Should we consolidate settings to `utils/settings.py` and remove `utils/config.py`? Which keys are authoritative?
 - Do you want Alembic migrations wired, or keep `create_all` on startup?
-- Where should `tenant_id` be set per request (header, token claim)?
 - Can we add `logging.yaml` and unify error handling around it?

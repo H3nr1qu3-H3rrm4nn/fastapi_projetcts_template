@@ -4,10 +4,9 @@ from jose import jwt
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from core.user.user_service import UserService
-from utils import settings
+from utils.settings import settings
 from utils.response_model import ResponseModel
 from utils.context_vars import admin, user_id
-from utils.context_vars import tenant_id
 
 app = FastAPI()
 
@@ -15,9 +14,12 @@ app = FastAPI()
 class JWTMiddleware(BaseHTTPMiddleware):
 
     allowed_paths = [
-        "/health"
+        "/health",
+        "/docs",
+        "/openapi.json",
+        "/user/login"
     ]
-
+    
     async def dispatch(self, request: Request, call_next):
         # Verificar rotas permitidas - usar startswith para permitir subrotas
         if any(request.url.path.startswith(path) for path in self.allowed_paths):
@@ -26,7 +28,7 @@ class JWTMiddleware(BaseHTTPMiddleware):
         try:
             token = request.headers.get("Authorization")
             token = jwt.decode(
-                token.removeprefix("Bearer "), settings.jwt_key, settings.jwt_algorithm
+                token.removeprefix("Bearer "), settings.SECRET_KEY, settings.ALGORITHM
             )
             request.scope["headers"].append((b"email", str(token["sub"]).encode()))
             request.scope["headers"].append((b"user", str(token["user"]).encode()))
@@ -34,8 +36,7 @@ class JWTMiddleware(BaseHTTPMiddleware):
             admin.set(token["admin"])
 
 
-            user_db = await UserService().find_by_email(token["sub"],
-                                                        tenant_id=token["ten"])
+            user_db = await UserService().find_by_email(token["sub"])
             if user_db is None:
                 return JSONResponse(
                     status_code=401,
